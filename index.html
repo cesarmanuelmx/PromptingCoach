@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Coach: Aprende Ingeniería de Prompts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .sidebar-item.active {
+            background-color: #4f46e5;
+            color: white;
+        }
+        .sidebar-item:hover {
+            background-color: #6366f1;
+            color: white;
+        }
+        .pro-badge {
+            background-color: #f59e0b;
+            color: #422006;
+        }
+        .error-badge {
+            background-color: #ef4444;
+            color: #7f1d1d;
+        }
+        .loader {
+            border-top-color: #4f46e5;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="w-full md:w-80 bg-white shadow-lg p-6 flex-shrink-0">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="p-2 bg-indigo-600 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+                </div>
+                <h1 class="text-xl font-bold text-gray-900">Prompt Coach</h1>
+            </div>
+            <nav id="technique-nav">
+                <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Técnicas Básicas</h2>
+                <ul class="space-y-2" id="basic-techniques"></ul>
+                <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3">Técnicas Avanzadas</h2>
+                <ul class="space-y-2" id="advanced-techniques"></ul>
+                <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3">Errores Comunes</h2>
+                <ul class="space-y-2" id="common-errors-nav"></ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6 md:p-10 overflow-y-auto">
+            <div id="content-area" class="max-w-4xl mx-auto">
+                <!-- Content will be injected here -->
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        // Data extracted from the provided guide
+        const techniques = {
+            // Basic Techniques
+            "start-simple": { name: "Comenzar Simple y de Forma Iterativa", category: "basic", explanation: "Una aproximación eficaz a la ingeniería de prompts es iniciar con solicitudes sencillas y, de manera progresiva, añadir elementos y contexto adicionales. Este método iterativo permite comprender cómo el modelo responde a diferentes niveles de complejidad y ajustar el prompt en consecuencia.", examples: [ { before: "Escribe un poema.", after: "Escribe un poema de cuatro estrofas sobre la belleza de un bosque en otoño, con un tono melancólico y usando metáforas relacionadas con el paso del tiempo." }, { before: "Dame una receta.", after: "Dame una receta de postre fácil con chocolate que no requiera horno y que se pueda hacer en menos de 30 minutos." } ], practicePrompt: "Escribe una idea de negocio." },
+            "clarity-specificity": { name: "Claridad y Especificidad", category: "basic", explanation: "La claridad y la especificidad son pilares fundamentales. Cuanto más descriptivo y detallado sea el prompt, mayores serán las probabilidades de obtener resultados de alta calidad. Es crucial evitar descripciones imprecisas.", examples: [ { before: "Escribe sobre historia.", after: "Escribe un ensayo de 500 palabras sobre las causas y consecuencias de la Revolución Francesa, dirigido a estudiantes universitarios de primer año." }, { before: "Dame ideas para una cena.", after: "Sugiere 3 ideas para una cena saludable y rápida (menos de 30 minutos) para una persona vegetariana, con ingredientes comunes." } ], practicePrompt: "Resume un libro." },
+            "action-verbs": { name: "Instrucciones Claras (Verbos de Acción)", category: "basic", explanation: "El uso de verbos de acción específicos es una técnica poderosa para indicar al modelo la tarea exacta que debe realizar. Verbos como 'Escribe', 'Clasifica', 'Resume', 'Traduce' proporcionan una dirección inequívoca.", examples: [ { before: "Información sobre el calentamiento global.", after: "Explica las causas y consecuencias del calentamiento global." }, { before: "Ayúdame con mi lista de tareas.", after: "Clasifica las siguientes tareas por prioridad: [lista de tareas]." } ], practicePrompt: "Quiero un texto sobre la historia de Roma." },
+            "provide-context": { name: "Proporcionar Contexto", category: "basic", explanation: "Incluir información relevante ayuda a la IA a comprender mejor la tarea. El contexto puede incluir antecedentes, el nivel de conocimiento requerido para la respuesta, o restricciones específicas.", examples: [ { before: "Escribe un artículo sobre la energía solar.", after: "Escribe un artículo de blog sobre los beneficios de la energía solar para propietarios de viviendas en climas fríos." }, { before: "Explica la teoría de la relatividad.", after: "Explica la teoría de la relatividad de Einstein a un estudiante de secundaria con conocimientos básicos de física, usando analogías sencillas." } ], practicePrompt: "Genera ideas para un proyecto." },
+            "act-as": { name: "Especificar una Persona o Rol (Actuar Como)", category: "basic", explanation: "Pedirle a la IA que 'actúe como' una persona específica (un chef, un asesor financiero, un historiador) alinea sus respuestas con una perspectiva o área de experiencia particular, ajustando su tono y estilo.", examples: [ { before: "Describe el Coliseo.", after: "Actúa como un guía turístico de la antigua Roma y describe un día típico en el Coliseo." }, { before: "Explica cómo invertir.", after: "Actúa como un asesor financiero y explica los conceptos básicos de la inversión en bolsa para un principiante." } ], practicePrompt: "Explica la Revolución Francesa." },
+            "few-shot": { name: "Incluir Ejemplos (Few-Shot Prompting)", category: "basic", explanation: "Proporcionar ejemplos de entrada-salida dentro del prompt guía a la IA hacia respuestas más acertadas y en formatos específicos. El modelo aprende del patrón y lo aplica a la nueva solicitud.", examples: [ { before: "Texto: Me encanta este día. Sentimiento:", after: "Texto: Me encanta este día. Sentimiento: Positivo\nTexto: ¡Qué gran noticia! Sentimiento:" }, { before: "Traduce 'hola'.", after: "Inglés: Hello, Español: Hola\nInglés: Goodbye, Español: Adiós\nInglés: Thank you, Español:" } ], practicePrompt: "Clasifica este animal: León." },
+            "output-format": { name: "Definir el Formato de Salida", category: "basic", explanation: "Indicar cómo se desea que se presente la respuesta es crucial. Los formatos pueden ser listas, párrafos, tablas, JSON, etc. Esto ayuda al modelo a estructurar su respuesta de manera organizada.", examples: [ { before: "Dame los beneficios de la meditación.", after: "Genera una lista numerada de los 5 beneficios principales de la meditación diaria." }, { before: "Compara Python y Java.", after: "Crea una tabla comparativa entre Python y Java, incluyendo columnas para 'Curva de Aprendizaje', 'Rendimiento' y 'Usos Comunes'." } ], practicePrompt: "Dame las capitales de España, Francia y Alemania." },
+            "chain-of-thought": { name: "Chain of Thought (CoT)", category: "advanced", explanation: "Esta técnica guía a la IA para que razone paso a paso antes de dar la respuesta final. Es útil para problemas complejos que requieren lógica o análisis. Una forma simple es añadir 'Pensemos paso a paso' al final del prompt.", examples: [ { before: "Si Juan tiene 5 manzanas y le da 2 a María, y luego compra 3 más, ¿cuántas tiene?", after: "Si Juan tiene 5 manzanas y le da 2 a María, y luego compra 3 más, ¿cuántas manzanas tiene Juan en total? Pensemos paso a paso." }, { before: "¿Cómo funciona una cadena de bloques?", after: "Explica cómo funciona una cadena de bloques desde la creación de un bloque hasta su validación. Pensemos paso a paso." } ], practicePrompt: "Un tren sale de A a 60 km/h. Otro sale de B (a 300 km) una hora después a 80 km/h hacia A. ¿Cuándo se encuentran?" },
+            "self-refine": { name: "Self-Refine", category: "advanced", explanation: "Implica pedir a la IA que resuelva un problema, luego critique su propia solución y, finalmente, la resuelva de nuevo considerando la crítica. Es un ciclo de autoevaluación y corrección para mejorar la precisión.", examples: [ { before: "Resuelve (5+3)*2-4.", after: "Resuelve (5+3)*2-4. Luego, revisa tu solución y explica cualquier posible error. Finalmente, proporciona la solución final corregida." }, { before: "Escribe un ensayo sobre la IA.", after: "Escribe un ensayo sobre el impacto de la IA en la sociedad. Después, autocrítica tu ensayo identificando puntos débiles. Finalmente, reescribe el ensayo incorporando las mejoras." } ], practicePrompt: "Genera un plan de negocios para una cafetería." },
+            "generated-knowledge": { name: "Generated Knowledge Prompting", category: "advanced", explanation: "Se le pide al modelo que primero genere información o conocimiento relevante sobre la consulta, y luego utilice esa información para formular la respuesta final. Es como una auto-investigación del modelo.", examples: [ { before: "Escribe sobre el espacio.", after: "Genera 5 hechos interesantes sobre el espacio exterior. Luego, escribe un párrafo que incorpore al menos 3 de esos hechos." }, { before: "¿Cómo combatir la deforestación?", after: "Describe las principales causas de la deforestación en la Amazonía. Luego, basándote en esa información, propone 3 soluciones innovadoras." } ], practicePrompt: "Explica la computación cuántica y sus aplicaciones futuras." },
+            "tree-of-thoughts": { name: "Tree of Thoughts (ToT)", category: "advanced", explanation: "Generaliza el CoT pidiendo al modelo que genere múltiples 'posibles próximos pasos' o 'pensamientos' en cada etapa. Permite explorar un espacio de búsqueda más amplio para problemas complejos.", examples: [ { before: "¿Cómo salir de esta cueva con acertijos?", after: "Un explorador está en una cueva con 3 caminos (pirañas, trampa, acertijo) y tiene objetos (caña, pluma, libro). Genera múltiples posibles soluciones y evalúa la viabilidad de cada una." }, { before: "Plan de marketing para un producto.", after: "Diseña una estrategia de lanzamiento para un nuevo software. Considera diferentes segmentos y canales. Genera al menos tres estrategias distintas y evalúa sus pros y contras." } ], practicePrompt: "Explora las posibles causas de la caída de la civilización maya." },
+            "least-to-most": { name: "Least-to-Most Prompting", category: "advanced", explanation: "Es una estrategia para resolver problemas complejos dividiéndolos en subproblemas más simples y resolviéndolos secuencialmente. El modelo resuelve cada paso basándose en las respuestas anteriores, progresando de lo más simple a lo más complejo.", examples: [ { before: "Analiza estos números: [5, 2, 8, 1, 9, 4].", after: "Dada la lista [5, 2, 8, 1, 9, 4]: Primero, ordénalos de menor a mayor. Luego, calcula la suma de los tres más grandes. Finalmente, encuentra el promedio de todos." }, { before: "Explica el ciclo del agua.", after: "Primero, describe el ciclo del agua. Luego, explica cómo la actividad humana afecta cada etapa. Finalmente, sugiere tres acciones que las comunidades pueden tomar." } ], practicePrompt: "Analiza 'Don Quijote de la Mancha' dividiendo la tarea en identificar personajes, describir su relación y analizar su evolución." },
+            "directional-stimulus": { name: "Directional Stimulus Prompting", category: "advanced", explanation: "Implica incluir pistas o 'estímulos' en el prompt, como palabras clave deseadas, para guiar al modelo hacia el resultado deseado. Estas pistas actúan como anclas que el modelo debe incorporar en su respuesta.", examples: [ { before: "Escribe un cuento de fantasía.", after: "Escribe un cuento corto de fantasía que incluya las palabras: dragón, espada, magia, reino, profecía." }, { before: "Describe una ciudad futurista.", after: "Describe un paisaje urbano futurista. Asegúrate de mencionar: rascacielos iluminados, vehículos voladores, hologramas publicitarios." } ], practicePrompt: "Genera un poema sobre el amor que contenga las frases: 'corazón roto', 'esperanza renovada' y 'alma gemela'." },
+            "rag": { name: "Retrieval Augmented Generation (RAG)", category: "advanced", explanation: "Combina modelos de lenguaje con una base de conocimientos externa (documentos, bases de datos, web) para obtener información actualizada. El modelo primero busca información relevante y luego la usa para formular su respuesta.", examples: [ { before: "Resume los hitos de la IA.", after: "Basándote en los documentos adjuntos sobre la historia de la inteligencia artificial, resume los hitos clave desde 1950 hasta 2000." }, { before: "¿Cuál es el precio del modelo XZ-2000?", after: "Utiliza la base de datos de productos para encontrar el precio y las especificaciones técnicas del modelo XZ-2000. Luego, genera una descripción de producto." } ], practicePrompt: "Usando las noticias más recientes, resume los avances en la exploración espacial del último mes." }
+        };
+
+        const commonErrorsData = {
+            id: "common-errors",
+            title: "Errores Comunes a Evitar",
+            explanation: "Para mejorar la calidad de las respuestas generadas por los modelos de IA, es crucial identificar y evitar una serie de errores comunes en la formulación de prompts. La omisión de estas precauciones puede llevar a resultados insatisfactorios, ambiguos o incluso incorrectos.",
+            errors: [
+                { name: "Ser Demasiado Vago", description: "Un prompt excesivamente amplio o genérico, como 'Háblame de la historia', generará respuestas poco útiles. La falta de detalle impide que el modelo enfoque su conocimiento de manera efectiva.", example: "<strong>A evitar:</strong> 'Escribe sobre coches.'<br><strong>Preferible:</strong> 'Escribe un artículo comparando el consumo de combustible de los coches híbridos y eléctricos más populares de 2024.'" },
+                { name: "No Especificar el Nivel de Detalle", description: "Puede llevar a respuestas demasiado básicas o, por el contrario, excesivamente complejas. Es vital especificar si la respuesta debe ser 'para un público general', 'para expertos', o 'un resumen ejecutivo'.", example: "<strong>A evitar:</strong> 'Explica la fotosíntesis.'<br><strong>Preferible:</strong> 'Explica la fotosíntesis para un niño de 10 años, usando analogías simples.'" },
+                { name: "Falta de Contexto", description: "La ausencia de contexto es un obstáculo significativo. Si se omite información relevante, como antecedentes o el propósito de la consulta, la IA puede generar respuestas irrelevantes.", example: "<strong>A evitar:</strong> 'Crea una historia.'<br><strong>Preferible:</strong> 'Crea una historia corta de ciencia ficción ambientada en una colonia lunar. El protagonista es un ingeniero que descubre una anomalía.'" },
+                { name: "Ambigüedad", description: "El uso de términos o frases vagas que no especifican claramente lo que se desea obliga al modelo a adivinar. La precisión en la elección de palabras es fundamental.", example: "<strong>A evitar:</strong> 'Hazlo mejor.'<br><strong>Preferible:</strong> 'Mejora la coherencia del argumento en el segundo párrafo y añade un ejemplo concreto.'" },
+                { name: "Complicar Demasiado las Cosas", description: "Prompts con demasiados pasos o instrucciones confusas pueden abrumar al modelo. Es preferible dividir una tarea compleja en prompts más pequeños y manejables.", example: "<strong>A evitar:</strong> Un solo prompt gigante para planificar un viaje.<br><strong>Preferible:</strong> Usar prompts separados para 'sugerir destinos', 'crear un itinerario' y 'redactar correos de reserva'." }
+            ]
+        };
+
+        const basicList = document.getElementById('basic-techniques');
+        const advancedList = document.getElementById('advanced-techniques');
+        const errorsNavList = document.getElementById('common-errors-nav');
+        const contentArea = document.getElementById('content-area');
+
+        function init() {
+            // Populate sidebar for techniques
+            Object.keys(techniques).forEach(key => {
+                const tech = techniques[key];
+                const listItem = document.createElement('li');
+                const link = document.createElement('a');
+                link.href = `#${key}`;
+                link.dataset.key = key;
+                link.className = 'sidebar-item flex items-center justify-between p-3 rounded-lg text-gray-700 font-medium transition-colors duration-200';
+                link.innerHTML = `<span>${tech.name}</span>` + (tech.category === 'advanced' ? `<span class="pro-badge text-xs font-semibold px-2 py-1 rounded-full">PRO</span>` : '');
+                
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    displayTechnique(key);
+                });
+
+                listItem.appendChild(link);
+                if (tech.category === 'basic') {
+                    basicList.appendChild(listItem);
+                } else {
+                    advancedList.appendChild(listItem);
+                }
+            });
+
+            // Populate sidebar for common errors
+            const errorListItem = document.createElement('li');
+            const errorLink = document.createElement('a');
+            errorLink.href = `#${commonErrorsData.id}`;
+            errorLink.dataset.key = commonErrorsData.id;
+            errorLink.className = 'sidebar-item flex items-center justify-between p-3 rounded-lg text-gray-700 font-medium transition-colors duration-200';
+            errorLink.innerHTML = `<span>${commonErrorsData.title}</span><span class="error-badge text-xs font-semibold px-2 py-1 rounded-full">INFO</span>`;
+            errorLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                displayErrorSection();
+            });
+            errorListItem.appendChild(errorLink);
+            errorsNavList.appendChild(errorListItem);
+
+
+            // Display first technique by default
+            const firstKey = Object.keys(techniques)[0];
+            displayTechnique(firstKey);
+        }
+        
+        function updateActiveSidebar(key) {
+             document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+             const activeItem = document.querySelector(`[data-key="${key}"]`);
+             if (activeItem) {
+                activeItem.classList.add('active');
+             }
+        }
+
+        function displayErrorSection() {
+            updateActiveSidebar(commonErrorsData.id);
+            contentArea.innerHTML = `
+                <div class="bg-white p-8 rounded-xl shadow-md transition-all duration-500 animate-fade-in">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-3xl font-bold text-gray-900">${commonErrorsData.title}</h2>
+                        <span class="error-badge text-sm font-semibold px-3 py-1 rounded-full">IMPORTANTE</span>
+                    </div>
+                    <p class="text-gray-600 mb-8 text-lg">${commonErrorsData.explanation}</p>
+
+                    <div class="space-y-6">
+                        ${commonErrorsData.errors.map(error => `
+                            <div class="bg-red-50 p-6 rounded-lg border border-red-200">
+                                <h3 class="text-xl font-semibold text-red-800 mb-2">${error.name}</h3>
+                                <p class="text-gray-700 mb-4">${error.description}</p>
+                                <div class="bg-white p-3 rounded border border-gray-200 text-sm">
+                                    ${error.example}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+
+        function displayTechnique(key) {
+            updateActiveSidebar(key);
+            const tech = techniques[key];
+            if (!tech) {
+                contentArea.innerHTML = `<p class="text-red-500">Técnica no encontrada.</p>`;
+                return;
+            }
+
+            contentArea.innerHTML = `
+                <div class="bg-white p-8 rounded-xl shadow-md transition-all duration-500 animate-fade-in">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-3xl font-bold text-gray-900">${tech.name}</h2>
+                        ${tech.category === 'advanced' ? '<span class="pro-badge text-sm font-semibold px-3 py-1 rounded-full">TÉCNICA AVANZADA</span>' : ''}
+                    </div>
+                    <p class="text-gray-600 mb-8 text-lg">${tech.explanation}</p>
+
+                    <div class="mb-10">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Ejemplos Clave</h3>
+                        <div class="space-y-4">
+                            ${tech.examples.map(ex => `
+                                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                    <p class="text-sm text-gray-500 font-medium mb-1">Antes (Menos Efectivo)</p>
+                                    <p class="text-gray-700 italic">"${ex.before}"</p>
+                                    <hr class="my-3 border-t-2 border-dashed border-gray-200">
+                                    <p class="text-sm text-green-600 font-medium mb-1">Después (Más Efectivo)</p>
+                                    <p class="text-green-800 font-semibold">"${ex.after}"</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">¡Pruébalo tú mismo!</h3>
+                        <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-200">
+                            <p class="text-indigo-800 mb-4">Usa el área de abajo para practicar la técnica de <strong>${tech.name}</strong>. Intenta mejorar el prompt de ejemplo o crea el tuyo propio.</p>
+                            <textarea id="practice-input" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" rows="4">${tech.practicePrompt}</textarea>
+                            <button id="coach-button" class="mt-4 w-full md:w-auto bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-transform transform hover:scale-105 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                                Pedir consejo al Coach
+                            </button>
+                            <div id="feedback-area" class="mt-4"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('coach-button').addEventListener('click', () => getFeedback(key));
+        }
+
+        // This function needs to be updated for Netlify deployment
+        // See the deployment guide for the correct version of this function
+        async function getFeedback(key) {
+            const tech = techniques[key];
+            const userInput = document.getElementById('practice-input').value;
+            const feedbackArea = document.getElementById('feedback-area');
+            const coachButton = document.getElementById('coach-button');
+
+            if (!userInput.trim()) {
+                feedbackArea.innerHTML = `<div class="p-4 bg-yellow-100 text-yellow-800 rounded-lg"><p>Por favor, escribe un prompt para que el coach lo revise.</p></div>`;
+                return;
+            }
+
+            feedbackArea.innerHTML = `
+                <div class="flex items-center justify-center p-4 bg-gray-100 rounded-lg">
+                    <div class="loader w-8 h-8 rounded-full border-4 border-gray-200"></div>
+                    <p class="ml-4 text-gray-600">El coach está pensando...</p>
+                </div>
+            `;
+            coachButton.disabled = true;
+            coachButton.classList.add('opacity-50', 'cursor-not-allowed');
+
+            const coachPrompt = `
+                Como un experto coach de ingeniería de prompts, tu tarea es analizar el prompt de un usuario que está aprendiendo la técnica de "${tech.name}".
+                Técnica a evaluar: "${tech.name}"
+                Explicación de la técnica: "${tech.explanation}"
+                Prompt del usuario:
+                """
+                ${userInput}
+                """
+                Tu análisis debe ser constructivo, amigable y educativo. Sigue esta estructura:
+                1.  **Análisis General:** Comienza con una evaluación general del prompt del usuario en relación con la técnica de "${tech.name}".
+                2.  **Puntos Fuertes:** Menciona uno o dos aspectos positivos del prompt.
+                3.  **Sugerencias de Mejora:** Ofrece 2-3 sugerencias claras y accionables sobre cómo el usuario podría mejorar su prompt aplicando mejor la técnica. Explica el "porqué" de cada sugerencia.
+                4.  **Ejemplo Mejorado:** Proporciona una versión reescrita del prompt del usuario que aplique tus sugerencias.
+                Responde en español y usa formato Markdown para una mejor legibilidad (negritas, listas).
+            `;
+            
+            try {
+                // NOTE: This fetch call is for local testing. For Netlify, you must use the serverless function approach.
+                // See the deployment guide for details.
+                let chatHistory = [{ role: "user", parts: [{ text: coachPrompt }] }];
+                const payload = { contents: chatHistory };
+                const apiKey = ""; // This will be handled by the environment in a real deployment
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content.parts[0].text) {
+                    const feedbackText = result.candidates[0].content.parts[0].text;
+                    let htmlFeedback = feedbackText
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\n\n/g, '<br><br>')
+                        .replace(/\n/g, '<br>')
+                        .replace(/(\d\.)/g, '<br><br>$1')
+                        .replace(/(\* )/g, '<br>&bull; ');
+
+                    feedbackArea.innerHTML = `
+                        <div class="p-6 bg-green-50 border border-green-200 rounded-lg mt-4 animate-fade-in">
+                            <h4 class="text-lg font-semibold text-green-800 mb-3">Análisis del Coach:</h4>
+                            <div class="text-gray-700 space-y-2">${htmlFeedback}</div>
+                        </div>
+                    `;
+                } else {
+                     throw new Error("Respuesta inesperada o vacía de la API.");
+                }
+
+            } catch (error) {
+                console.error("Error fetching feedback:", error);
+                feedbackArea.innerHTML = `
+                    <div class="p-4 bg-red-100 text-red-800 rounded-lg">
+                        <p><strong>¡Ups! Hubo un error.</strong> No se pudo obtener la retroalimentación del coach. Por favor, inténtalo de nuevo más tarde.</p>
+                        <p class="text-sm mt-2">${error.message}</p>
+                    </div>
+                `;
+            } finally {
+                coachButton.disabled = false;
+                coachButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+        
+        // Initial load
+        init();
+    </script>
+</body>
+</html>
