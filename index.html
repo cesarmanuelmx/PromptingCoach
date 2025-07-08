@@ -26,6 +26,10 @@
             background-color: #ef4444;
             color: #7f1d1d;
         }
+        .info-badge {
+            background-color: #3b82f6;
+            color: #1e3a8a;
+        }
         .loader {
             border-top-color: #4f46e5;
             animation: spin 1s linear infinite;
@@ -56,11 +60,12 @@
                 <h1 class="text-xl font-bold text-gray-900">Prompt Coach</h1>
             </div>
             <nav id="technique-nav">
-                <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Técnicas Básicas</h2>
+                <ul class="space-y-2" id="intro-nav"></ul>
+                <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3">Técnicas Básicas</h2>
                 <ul class="space-y-2" id="basic-techniques"></ul>
                 <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3">Técnicas Avanzadas</h2>
                 <ul class="space-y-2" id="advanced-techniques"></ul>
-                <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3">Errores Comunes</h2>
+                <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mt-6 mb-3">Guías Adicionales</h2>
                 <ul class="space-y-2" id="common-errors-nav"></ul>
             </nav>
         </aside>
@@ -74,9 +79,26 @@
     </div>
 
     <script type="module">
-        // Datos extraídos de la guía proporcionada
+        // --- DATA OBJECTS ---
+        const introductionData = {
+            id: "introduction",
+            title: "Introducción",
+            welcomeMessage: "¡Bienvenido a Prompt Coach! Esta es tu guía interactiva para dominar la comunicación con la Inteligencia Artificial. Comencemos con los conceptos fundamentales.",
+            sections: [
+                {
+                    title: "¿Qué es un Prompt?",
+                    content: "Un prompt es la <strong>entrada, instrucción o contexto</strong> que le proporcionas a un modelo de IA para guiarlo en la generación de una respuesta o en la finalización de una tarea. Piensa en él como la pregunta o la orden que le das a la IA.",
+                    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 text-indigo-500"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"/></svg>`
+                },
+                {
+                    title: "¿Qué es la Ingeniería de Prompts?",
+                    content: "Es el <strong>arte y la ciencia de diseñar, ajustar y refinar</strong> los prompts para obtener los resultados más precisos, relevantes y deseados de un modelo de IA. Dominar esta habilidad es crucial para una comunicación efectiva y productiva con la inteligencia artificial.",
+                    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 text-indigo-500"><path d="M15.232 5.232a3 3 0 0 1 4.243 4.243L7.121 21.828a2 2 0 0 1-1.414.586H4v-1.707a2 2 0 0 1 .586-1.414z"/><path d="m18 2-2 2"/></svg>`
+                }
+            ]
+        };
+
         const techniques = {
-            // Técnicas Básicas
             "start-simple": { name: "Comenzar Simple y de Forma Iterativa", category: "basic", explanation: "Una aproximación eficaz a la ingeniería de prompts es iniciar con solicitudes sencillas y, de manera progresiva, añadir elementos y contexto adicionales. Este método iterativo permite comprender cómo el modelo responde a diferentes niveles de complejidad y ajustar el prompt en consecuencia.", examples: [ { before: "Escribe un poema.", after: "Escribe un poema de cuatro estrofas sobre la belleza de un bosque en otoño, con un tono melancólico y usando metáforas relacionadas con el paso del tiempo." }, { before: "Dame una receta.", after: "Dame una receta de postre fácil con chocolate que no requiera horno y que se pueda hacer en menos de 30 minutos." } ], practicePrompt: "Escribe una idea de negocio." },
             "clarity-specificity": { name: "Claridad y Especificidad", category: "basic", explanation: "La claridad y la especificidad son pilares fundamentales. Cuanto más descriptivo y detallado sea el prompt, mayores serán las probabilidades de obtener resultados de alta calidad. Es crucial evitar descripciones imprecisas.", examples: [ { before: "Escribe sobre historia.", after: "Escribe un ensayo de 500 palabras sobre las causas y consecuencias de la Revolución Francesa, dirigido a estudiantes universitarios de primer año." }, { before: "Dame ideas para una cena.", after: "Sugiere 3 ideas para una cena saludable y rápida (menos de 30 minutos) para una persona vegetariana, con ingredientes comunes." } ], practicePrompt: "Resume un libro." },
             "action-verbs": { name: "Instrucciones Claras (Verbos de Acción)", category: "basic", explanation: "El uso de verbos de acción específicos es una técnica poderosa para indicar al modelo la tarea exacta que debe realizar. Verbos como 'Escribe', 'Clasifica', 'Resume', 'Traduce' proporcionan una dirección inequívoca.", examples: [ { before: "Información sobre el calentamiento global.", after: "Explica las causas y consecuencias del calentamiento global." }, { before: "Ayúdame con mi lista de tareas.", after: "Clasifica las siguientes tareas por prioridad: [lista de tareas]." } ], practicePrompt: "Quiero un texto sobre la historia de Roma." },
@@ -84,7 +106,6 @@
             "act-as": { name: "Especificar una Persona o Rol (Actuar Como)", category: "basic", explanation: "Pedirle a la IA que 'actúe como' una persona específica (un chef, un asesor financiero, un historiador) alinea sus respuestas con una perspectiva o área de experiencia particular, ajustando su tono y estilo.", examples: [ { before: "Describe el Coliseo.", after: "Actúa como un guía turístico de la antigua Roma y describe un día típico en el Coliseo." }, { before: "Explica cómo invertir.", after: "Actúa como un asesor financiero y explica los conceptos básicos de la inversión en bolsa para un principiante." } ], practicePrompt: "Explica la Revolución Francesa." },
             "few-shot": { name: "Incluir Ejemplos (Few-Shot Prompting)", category: "basic", explanation: "Proporcionar ejemplos de entrada-salida dentro del prompt guía a la IA hacia respuestas más acertadas y en formatos específicos. El modelo aprende del patrón y lo aplica a la nueva solicitud.", examples: [ { before: "Texto: Me encanta este día. Sentimiento:", after: "Texto: Me encanta este día. Sentimiento: Positivo\nTexto: ¡Qué gran noticia! Sentimiento:" }, { before: "Traduce 'hola'.", after: "Inglés: Hello, Español: Hola\nInglés: Goodbye, Español: Adiós\nInglés: Thank you, Español:" } ], practicePrompt: "Clasifica este animal: León." },
             "output-format": { name: "Definir el Formato de Salida", category: "basic", explanation: "Indicar cómo se desea que se presente la respuesta es crucial. Los formatos pueden ser listas, párrafos, tablas, JSON, etc. Esto ayuda al modelo a estructurar su respuesta de manera organizada.", examples: [ { before: "Dame los beneficios de la meditación.", after: "Genera una lista numerada de los 5 beneficios principales de la meditación diaria." }, { before: "Compara Python y Java.", after: "Crea una tabla comparativa entre Python y Java, incluyendo columnas para 'Curva de Aprendizaje', 'Rendimiento' y 'Usos Comunes'." } ], practicePrompt: "Dame las capitales de España, Francia y Alemania." },
-            // Técnicas Avanzadas
             "chain-of-thought": { name: "Chain of Thought (CoT)", category: "advanced", explanation: "Esta técnica guía a la IA para que razone paso a paso antes de dar la respuesta final. Es útil para problemas complejos que requieren lógica o análisis. Una forma simple es añadir 'Pensemos paso a paso' al final del prompt.", examples: [ { before: "Si Juan tiene 5 manzanas y le da 2 a María, y luego compra 3 más, ¿cuántas tiene?", after: "Si Juan tiene 5 manzanas y le da 2 a María, y luego compra 3 más, ¿cuántas manzanas tiene Juan en total? Pensemos paso a paso." }, { before: "¿Cómo funciona una cadena de bloques?", after: "Explica cómo funciona una cadena de bloques desde la creación de un bloque hasta su validación. Pensemos paso a paso." } ], practicePrompt: "Un tren sale de A a 60 km/h. Otro sale de B (a 300 km) una hora después a 80 km/h hacia A. ¿Cuándo se encuentran?" },
             "self-refine": { name: "Self-Refine", category: "advanced", explanation: "Implica pedir a la IA que resuelva un problema, luego critique su propia solución y, finalmente, la resuelva de nuevo considerando la crítica. Es un ciclo de autoevaluación y corrección para mejorar la precisión.", examples: [ { before: "Resuelve (5+3)*2-4.", after: "Resuelve (5+3)*2-4. Luego, revisa tu solución y explica cualquier posible error. Finalmente, proporciona la solución final corregida." }, { before: "Escribe un ensayo sobre la IA.", after: "Escribe un ensayo sobre el impacto de la IA en la sociedad. Después, autocrítica tu ensayo identificando puntos débiles. Finalmente, reescribe el ensayo incorporando las mejoras." } ], practicePrompt: "Genera un plan de negocios para una cafetería." },
             "generated-knowledge": { name: "Generated Knowledge Prompting", category: "advanced", explanation: "Se le pide al modelo que primero genere información o conocimiento relevante sobre la consulta, y luego utilice esa información para formular la respuesta final. Es como una auto-investigación del modelo.", examples: [ { before: "Escribe sobre el espacio.", after: "Genera 5 hechos interesantes sobre el espacio exterior. Luego, escribe un párrafo que incorpore al menos 3 de esos hechos." }, { before: "¿Cómo combatir la deforestación?", after: "Describe las principales causas de la deforestación en la Amazonía. Luego, basándote en esa información, propone 3 soluciones innovadoras." } ], practicePrompt: "Explica la computación cuántica y sus aplicaciones futuras." },
@@ -107,13 +128,30 @@
             ]
         };
 
+        // --- DOM ELEMENTS ---
+        const introNavList = document.getElementById('intro-nav');
         const basicList = document.getElementById('basic-techniques');
         const advancedList = document.getElementById('advanced-techniques');
         const errorsNavList = document.getElementById('common-errors-nav');
         const contentArea = document.getElementById('content-area');
 
+        // --- INITIALIZATION ---
         function init() {
-            // Poblar la barra lateral para las técnicas
+            // Populate intro nav
+            const introListItem = document.createElement('li');
+            const introLink = document.createElement('a');
+            introLink.href = `#${introductionData.id}`;
+            introLink.dataset.key = introductionData.id;
+            introLink.className = 'sidebar-item flex items-center justify-between p-3 rounded-lg text-gray-700 font-medium transition-colors duration-200';
+            introLink.innerHTML = `<span>${introductionData.title}</span><span class="info-badge text-xs font-semibold px-2 py-1 rounded-full">START</span>`;
+            introLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                displayIntroductionSection();
+            });
+            introListItem.appendChild(introLink);
+            introNavList.appendChild(introListItem);
+
+            // Populate techniques nav
             Object.keys(techniques).forEach(key => {
                 const tech = techniques[key];
                 const listItem = document.createElement('li');
@@ -122,46 +160,55 @@
                 link.dataset.key = key;
                 link.className = 'sidebar-item flex items-center justify-between p-3 rounded-lg text-gray-700 font-medium transition-colors duration-200';
                 link.innerHTML = `<span>${tech.name}</span>` + (tech.category === 'advanced' ? `<span class="pro-badge text-xs font-semibold px-2 py-1 rounded-full">PRO</span>` : '');
-                
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    displayTechnique(key);
-                });
-
+                link.addEventListener('click', (e) => { e.preventDefault(); displayTechnique(key); });
                 listItem.appendChild(link);
-                if (tech.category === 'basic') {
-                    basicList.appendChild(listItem);
-                } else {
-                    advancedList.appendChild(listItem);
-                }
+                if (tech.category === 'basic') basicList.appendChild(listItem);
+                else advancedList.appendChild(listItem);
             });
 
-            // Poblar la barra lateral para los errores comunes
+            // Populate common errors nav
             const errorListItem = document.createElement('li');
             const errorLink = document.createElement('a');
             errorLink.href = `#${commonErrorsData.id}`;
             errorLink.dataset.key = commonErrorsData.id;
             errorLink.className = 'sidebar-item flex items-center justify-between p-3 rounded-lg text-gray-700 font-medium transition-colors duration-200';
             errorLink.innerHTML = `<span>${commonErrorsData.title}</span><span class="error-badge text-xs font-semibold px-2 py-1 rounded-full">INFO</span>`;
-            errorLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                displayErrorSection();
-            });
+            errorLink.addEventListener('click', (e) => { e.preventDefault(); displayErrorSection(); });
             errorListItem.appendChild(errorLink);
             errorsNavList.appendChild(errorListItem);
 
-
-            // Mostrar la primera técnica por defecto
-            const firstKey = Object.keys(techniques)[0];
-            displayTechnique(firstKey);
+            // Display introduction by default
+            displayIntroductionSection();
         }
         
+        // --- DISPLAY FUNCTIONS ---
         function updateActiveSidebar(key) {
              document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
              const activeItem = document.querySelector(`[data-key="${key}"]`);
-             if (activeItem) {
-                activeItem.classList.add('active');
-             }
+             if (activeItem) activeItem.classList.add('active');
+        }
+
+        function displayIntroductionSection() {
+            updateActiveSidebar(introductionData.id);
+            contentArea.innerHTML = `
+                <div class="bg-white p-8 rounded-xl shadow-md transition-all duration-500 animate-fade-in">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-4">${introductionData.title}</h2>
+                    <p class="text-gray-600 mb-10 text-lg">${introductionData.welcomeMessage}</p>
+                    <div class="space-y-8">
+                        ${introductionData.sections.map(section => `
+                            <div class="flex items-start gap-6">
+                                <div class="flex-shrink-0 bg-indigo-100 p-3 rounded-full">
+                                    ${section.icon}
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-semibold text-gray-800 mb-2">${section.title}</h3>
+                                    <p class="text-gray-700 leading-relaxed">${section.content}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
         }
 
         function displayErrorSection() {
@@ -173,22 +220,18 @@
                         <span class="error-badge text-sm font-semibold px-3 py-1 rounded-full">IMPORTANTE</span>
                     </div>
                     <p class="text-gray-600 mb-8 text-lg">${commonErrorsData.explanation}</p>
-
                     <div class="space-y-6">
                         ${commonErrorsData.errors.map(error => `
                             <div class="bg-red-50 p-6 rounded-lg border border-red-200">
                                 <h3 class="text-xl font-semibold text-red-800 mb-2">${error.name}</h3>
                                 <p class="text-gray-700 mb-4">${error.description}</p>
-                                <div class="bg-white p-3 rounded border border-gray-200 text-sm">
-                                    ${error.example}
-                                </div>
+                                <div class="bg-white p-3 rounded border border-gray-200 text-sm">${error.example}</div>
                             </div>
                         `).join('')}
                     </div>
                 </div>
             `;
         }
-
 
         function displayTechnique(key) {
             updateActiveSidebar(key);
@@ -197,7 +240,6 @@
                 contentArea.innerHTML = `<p class="text-red-500">Técnica no encontrada.</p>`;
                 return;
             }
-
             contentArea.innerHTML = `
                 <div class="bg-white p-8 rounded-xl shadow-md transition-all duration-500 animate-fade-in">
                     <div class="flex items-center justify-between mb-4">
@@ -205,7 +247,6 @@
                         ${tech.category === 'advanced' ? '<span class="pro-badge text-sm font-semibold px-3 py-1 rounded-full">TÉCNICA AVANZADA</span>' : ''}
                     </div>
                     <p class="text-gray-600 mb-8 text-lg">${tech.explanation}</p>
-
                     <div class="mb-10">
                         <h3 class="text-xl font-semibold text-gray-800 mb-4">Ejemplos Clave</h3>
                         <div class="space-y-4">
@@ -220,7 +261,6 @@
                             `).join('')}
                         </div>
                     </div>
-
                     <div>
                         <h3 class="text-xl font-semibold text-gray-800 mb-4">¡Pruébalo tú mismo!</h3>
                         <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-200">
@@ -235,10 +275,10 @@
                     </div>
                 </div>
             `;
-
             document.getElementById('coach-button').addEventListener('click', () => getFeedback(key));
         }
 
+        // --- API CALL ---
         async function getFeedback(key) {
             const tech = techniques[key];
             const userInput = document.getElementById('practice-input').value;
@@ -276,7 +316,6 @@
             `;
             
             try {
-                // ¡CAMBIO IMPORTANTE! Esta llamada es para la función serverless de Netlify.
                 const response = await fetch('/.netlify/functions/getFeedback', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
