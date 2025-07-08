@@ -68,15 +68,15 @@
         <!-- Main Content -->
         <main class="flex-1 p-6 md:p-10 overflow-y-auto">
             <div id="content-area" class="max-w-4xl mx-auto">
-                <!-- Content will be injected here -->
+                <!-- El contenido se inyectará aquí -->
             </div>
         </main>
     </div>
 
     <script type="module">
-        // Data extracted from the provided guide
+        // Datos extraídos de la guía proporcionada
         const techniques = {
-            // Basic Techniques
+            // Técnicas Básicas
             "start-simple": { name: "Comenzar Simple y de Forma Iterativa", category: "basic", explanation: "Una aproximación eficaz a la ingeniería de prompts es iniciar con solicitudes sencillas y, de manera progresiva, añadir elementos y contexto adicionales. Este método iterativo permite comprender cómo el modelo responde a diferentes niveles de complejidad y ajustar el prompt en consecuencia.", examples: [ { before: "Escribe un poema.", after: "Escribe un poema de cuatro estrofas sobre la belleza de un bosque en otoño, con un tono melancólico y usando metáforas relacionadas con el paso del tiempo." }, { before: "Dame una receta.", after: "Dame una receta de postre fácil con chocolate que no requiera horno y que se pueda hacer en menos de 30 minutos." } ], practicePrompt: "Escribe una idea de negocio." },
             "clarity-specificity": { name: "Claridad y Especificidad", category: "basic", explanation: "La claridad y la especificidad son pilares fundamentales. Cuanto más descriptivo y detallado sea el prompt, mayores serán las probabilidades de obtener resultados de alta calidad. Es crucial evitar descripciones imprecisas.", examples: [ { before: "Escribe sobre historia.", after: "Escribe un ensayo de 500 palabras sobre las causas y consecuencias de la Revolución Francesa, dirigido a estudiantes universitarios de primer año." }, { before: "Dame ideas para una cena.", after: "Sugiere 3 ideas para una cena saludable y rápida (menos de 30 minutos) para una persona vegetariana, con ingredientes comunes." } ], practicePrompt: "Resume un libro." },
             "action-verbs": { name: "Instrucciones Claras (Verbos de Acción)", category: "basic", explanation: "El uso de verbos de acción específicos es una técnica poderosa para indicar al modelo la tarea exacta que debe realizar. Verbos como 'Escribe', 'Clasifica', 'Resume', 'Traduce' proporcionan una dirección inequívoca.", examples: [ { before: "Información sobre el calentamiento global.", after: "Explica las causas y consecuencias del calentamiento global." }, { before: "Ayúdame con mi lista de tareas.", after: "Clasifica las siguientes tareas por prioridad: [lista de tareas]." } ], practicePrompt: "Quiero un texto sobre la historia de Roma." },
@@ -84,6 +84,7 @@
             "act-as": { name: "Especificar una Persona o Rol (Actuar Como)", category: "basic", explanation: "Pedirle a la IA que 'actúe como' una persona específica (un chef, un asesor financiero, un historiador) alinea sus respuestas con una perspectiva o área de experiencia particular, ajustando su tono y estilo.", examples: [ { before: "Describe el Coliseo.", after: "Actúa como un guía turístico de la antigua Roma y describe un día típico en el Coliseo." }, { before: "Explica cómo invertir.", after: "Actúa como un asesor financiero y explica los conceptos básicos de la inversión en bolsa para un principiante." } ], practicePrompt: "Explica la Revolución Francesa." },
             "few-shot": { name: "Incluir Ejemplos (Few-Shot Prompting)", category: "basic", explanation: "Proporcionar ejemplos de entrada-salida dentro del prompt guía a la IA hacia respuestas más acertadas y en formatos específicos. El modelo aprende del patrón y lo aplica a la nueva solicitud.", examples: [ { before: "Texto: Me encanta este día. Sentimiento:", after: "Texto: Me encanta este día. Sentimiento: Positivo\nTexto: ¡Qué gran noticia! Sentimiento:" }, { before: "Traduce 'hola'.", after: "Inglés: Hello, Español: Hola\nInglés: Goodbye, Español: Adiós\nInglés: Thank you, Español:" } ], practicePrompt: "Clasifica este animal: León." },
             "output-format": { name: "Definir el Formato de Salida", category: "basic", explanation: "Indicar cómo se desea que se presente la respuesta es crucial. Los formatos pueden ser listas, párrafos, tablas, JSON, etc. Esto ayuda al modelo a estructurar su respuesta de manera organizada.", examples: [ { before: "Dame los beneficios de la meditación.", after: "Genera una lista numerada de los 5 beneficios principales de la meditación diaria." }, { before: "Compara Python y Java.", after: "Crea una tabla comparativa entre Python y Java, incluyendo columnas para 'Curva de Aprendizaje', 'Rendimiento' y 'Usos Comunes'." } ], practicePrompt: "Dame las capitales de España, Francia y Alemania." },
+            // Técnicas Avanzadas
             "chain-of-thought": { name: "Chain of Thought (CoT)", category: "advanced", explanation: "Esta técnica guía a la IA para que razone paso a paso antes de dar la respuesta final. Es útil para problemas complejos que requieren lógica o análisis. Una forma simple es añadir 'Pensemos paso a paso' al final del prompt.", examples: [ { before: "Si Juan tiene 5 manzanas y le da 2 a María, y luego compra 3 más, ¿cuántas tiene?", after: "Si Juan tiene 5 manzanas y le da 2 a María, y luego compra 3 más, ¿cuántas manzanas tiene Juan en total? Pensemos paso a paso." }, { before: "¿Cómo funciona una cadena de bloques?", after: "Explica cómo funciona una cadena de bloques desde la creación de un bloque hasta su validación. Pensemos paso a paso." } ], practicePrompt: "Un tren sale de A a 60 km/h. Otro sale de B (a 300 km) una hora después a 80 km/h hacia A. ¿Cuándo se encuentran?" },
             "self-refine": { name: "Self-Refine", category: "advanced", explanation: "Implica pedir a la IA que resuelva un problema, luego critique su propia solución y, finalmente, la resuelva de nuevo considerando la crítica. Es un ciclo de autoevaluación y corrección para mejorar la precisión.", examples: [ { before: "Resuelve (5+3)*2-4.", after: "Resuelve (5+3)*2-4. Luego, revisa tu solución y explica cualquier posible error. Finalmente, proporciona la solución final corregida." }, { before: "Escribe un ensayo sobre la IA.", after: "Escribe un ensayo sobre el impacto de la IA en la sociedad. Después, autocrítica tu ensayo identificando puntos débiles. Finalmente, reescribe el ensayo incorporando las mejoras." } ], practicePrompt: "Genera un plan de negocios para una cafetería." },
             "generated-knowledge": { name: "Generated Knowledge Prompting", category: "advanced", explanation: "Se le pide al modelo que primero genere información o conocimiento relevante sobre la consulta, y luego utilice esa información para formular la respuesta final. Es como una auto-investigación del modelo.", examples: [ { before: "Escribe sobre el espacio.", after: "Genera 5 hechos interesantes sobre el espacio exterior. Luego, escribe un párrafo que incorpore al menos 3 de esos hechos." }, { before: "¿Cómo combatir la deforestación?", after: "Describe las principales causas de la deforestación en la Amazonía. Luego, basándote en esa información, propone 3 soluciones innovadoras." } ], practicePrompt: "Explica la computación cuántica y sus aplicaciones futuras." },
@@ -112,7 +113,7 @@
         const contentArea = document.getElementById('content-area');
 
         function init() {
-            // Populate sidebar for techniques
+            // Poblar la barra lateral para las técnicas
             Object.keys(techniques).forEach(key => {
                 const tech = techniques[key];
                 const listItem = document.createElement('li');
@@ -135,7 +136,7 @@
                 }
             });
 
-            // Populate sidebar for common errors
+            // Poblar la barra lateral para los errores comunes
             const errorListItem = document.createElement('li');
             const errorLink = document.createElement('a');
             errorLink.href = `#${commonErrorsData.id}`;
@@ -150,7 +151,7 @@
             errorsNavList.appendChild(errorListItem);
 
 
-            // Display first technique by default
+            // Mostrar la primera técnica por defecto
             const firstKey = Object.keys(techniques)[0];
             displayTechnique(firstKey);
         }
@@ -238,91 +239,15 @@
             document.getElementById('coach-button').addEventListener('click', () => getFeedback(key));
         }
 
-        // This function needs to be updated for Netlify deployment
-        // See the deployment guide for the correct version of this function
         async function getFeedback(key) {
-            async function getFeedback(key) {
-    const tech = techniques[key];
-    const userInput = document.getElementById('practice-input').value;
-    const feedbackArea = document.getElementById('feedback-area');
-    const coachButton = document.getElementById('coach-button');
+            const tech = techniques[key];
+            const userInput = document.getElementById('practice-input').value;
+            const feedbackArea = document.getElementById('feedback-area');
+            const coachButton = document.getElementById('coach-button');
 
-    if (!userInput.trim()) {
-        feedbackArea.innerHTML = `<div class="p-4 bg-yellow-100 text-yellow-800 rounded-lg"><p>Por favor, escribe un prompt para que el coach lo revise.</p></div>`;
-        return;
-    }
-
-    feedbackArea.innerHTML = `
-        <div class="flex items-center justify-center p-4 bg-gray-100 rounded-lg">
-            <div class="loader w-8 h-8 rounded-full border-4 border-gray-200"></div>
-            <p class="ml-4 text-gray-600">El coach está pensando...</p>
-        </div>
-    `;
-    coachButton.disabled = true;
-    coachButton.classList.add('opacity-50', 'cursor-not-allowed');
-
-    const coachPrompt = `
-        Como un experto coach de ingeniería de prompts, tu tarea es analizar el prompt de un usuario que está aprendiendo la técnica de "${tech.name}".
-        Técnica a evaluar: "${tech.name}"
-        Explicación de la técnica: "${tech.explanation}"
-        Prompt del usuario:
-        """
-        ${userInput}
-        """
-        Tu análisis debe ser constructivo, amigable y educativo. Sigue esta estructura:
-        1.  **Análisis General:** Comienza con una evaluación general del prompt del usuario en relación con la técnica de "${tech.name}".
-        2.  **Puntos Fuertes:** Menciona uno o dos aspectos positivos del prompt.
-        3.  **Sugerencias de Mejora:** Ofrece 2-3 sugerencias claras y accionables sobre cómo el usuario podría mejorar su prompt aplicando mejor la técnica. Explica el "porqué" de cada sugerencia.
-        4.  **Ejemplo Mejorado:** Proporciona una versión reescrita del prompt del usuario que aplique tus sugerencias.
-        Responde en español y usa formato Markdown para una mejor legibilidad (negritas, listas).
-    `;
-
-    try {
-        // ¡CAMBIO IMPORTANTE! Llamamos a nuestra función de Netlify
-        const response = await fetch('/.netlify/functions/getFeedback', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ coachPrompt: coachPrompt })
-        });
-
-        if (!response.ok) {
-            throw new Error(`Error en la función: ${response.statusText}`);
-        }
-
-        const result = await response.json();
-
-        if (result.candidates && result.candidates.length > 0 && result.candidates[0].content.parts[0].text) {
-            const feedbackText = result.candidates[0].content.parts[0].text;
-            let htmlFeedback = feedbackText
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\n\n/g, '<br><br>')
-                .replace(/\n/g, '<br>')
-                .replace(/(\d\.)/g, '<br><br>$1')
-                .replace(/(\* )/g, '<br>&bull; ');
-
-            feedbackArea.innerHTML = `
-                <div class="p-6 bg-green-50 border border-green-200 rounded-lg mt-4 animate-fade-in">
-                    <h4 class="text-lg font-semibold text-green-800 mb-3">Análisis del Coach:</h4>
-                    <div class="text-gray-700 space-y-2">${htmlFeedback}</div>
-                </div>
-            `;
-        } else {
-             throw new Error("Respuesta inesperada o vacía de la API.");
-        }
-
-    } catch (error) {
-        console.error("Error fetching feedback:", error);
-        feedbackArea.innerHTML = `
-            <div class="p-4 bg-red-100 text-red-800 rounded-lg">
-                <p><strong>¡Ups! Hubo un error.</strong> No se pudo obtener la retroalimentación del coach. Por favor, inténtalo de nuevo más tarde.</p>
-                <p class="text-sm mt-2">${error.message}</p>
-            </div>
-        `;
-    } finally {
-        coachButton.disabled = false;
-        coachButton.classList.remove('opacity-50', 'cursor-not-allowed');
-    }
-}
+            if (!userInput.trim()) {
+                feedbackArea.innerHTML = `<div class="p-4 bg-yellow-100 text-yellow-800 rounded-lg"><p>Por favor, escribe un prompt para que el coach lo revise.</p></div>`;
+                return;
             }
 
             feedbackArea.innerHTML = `
@@ -351,21 +276,16 @@
             `;
             
             try {
-                // NOTE: This fetch call is for local testing. For Netlify, you must use the serverless function approach.
-                // See the deployment guide for details.
-                let chatHistory = [{ role: "user", parts: [{ text: coachPrompt }] }];
-                const payload = { contents: chatHistory };
-                const apiKey = ""; // This will be handled by the environment in a real deployment
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-                const response = await fetch(apiUrl, {
+                // ¡CAMBIO IMPORTANTE! Esta llamada es para la función serverless de Netlify.
+                const response = await fetch('/.netlify/functions/getFeedback', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({ coachPrompt: coachPrompt })
                 });
 
                 if (!response.ok) {
-                    throw new Error(`API Error: ${response.statusText}`);
+                    const errorData = await response.json();
+                    throw new Error(`Error en la función: ${errorData.error || response.statusText}`);
                 }
 
                 const result = await response.json();
@@ -403,7 +323,7 @@
             }
         }
         
-        // Initial load
+        // Carga inicial
         init();
     </script>
 </body>
